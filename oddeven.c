@@ -5,13 +5,15 @@
 #include <time.h>
 #include <string.h>
 
-int cmp(const void *a, const void *b);
+int cmp(const void *a, const void *b)
+{
+	return *(int *)a - *(int *)b;
+}
 
 int main(int argc, char** argv) {
 	// 初始化 MPI 环境
 	MPI_Init(&argc, &argv);
 
-	// printf("argc %d\n", argc);
 	int p;
 	MPI_Comm_size(MPI_COMM_WORLD, &p);
 
@@ -56,21 +58,23 @@ int main(int argc, char** argv) {
 	}
 
 	qsort(a, na, sizeof(int), cmp);
-
-	// for (int j = 0; j < p; j++) {
-	// 	if (rank == j) {
-	// 		printf("rank %d:", rank);
-	// 		for (int k = 0; k < na; k++) {
-	// 			printf(" %d", a[k]);
-	// 		}
-	// 		printf("\n");
-	// 	}
-	// 	MPI_Barrier(MPI_COMM_WORLD);
-	// }
-
+#ifdef DEBUG
+	for (int j = 0; j < p; j++) {
+		if (rank == j) {
+			printf("rank %d:", rank);
+			for (int k = 0; k < na; k++) {
+				printf(" %d", a[k]);
+			}
+			printf("\n");
+		}
+		MPI_Barrier(MPI_COMM_WORLD);
+	}
+#endif
 	for (int i = 0; i < p; i++) {
-		// if (rank == 0)
-		// 	printf("<===== stage %d =====>\n", i);
+#ifdef DEBUG
+		if (rank == 0)
+			printf("<===== stage %d =====>\n", i);
+#endif
 		int small;
 		if (i%2 == 0) {
 			small = rank%2 == 0;
@@ -109,21 +113,23 @@ int main(int argc, char** argv) {
 				}
 			}
 		}
-		// for (int j = 0; j < p; j++) {
-		// 	if (rank == j) {
-		// 		printf("rank %d:", rank);
-		// 		for (int k = 0; k < na; k++) {
-		// 			printf(" %d", a[k]);
-		// 		}
-		// 		printf("\n");
-		// 		// printf("swap %d:", swap_rank);
-		// 		// for (int k = 0; k < nb; k++) {
-		// 		// 	printf(" %d", b[k]);
-		// 		// }
-		// 		// printf("\n");
-		// 	}
-		// 	MPI_Barrier(MPI_COMM_WORLD);
-		// }
+#ifdef DEBUG
+		for (int j = 0; j < p; j++) {
+			if (rank == j) {
+				printf("rank %d:", rank);
+				for (int k = 0; k < na; k++) {
+					printf(" %d", a[k]);
+				}
+				printf("\n");
+				printf("swap %d:", swap_rank);
+				for (int k = 0; k < nb; k++) {
+					printf(" %d", b[k]);
+				}
+				printf("\n");
+			}
+			MPI_Barrier(MPI_COMM_WORLD);
+		}
+#endif
 	}
 
 	if (rank == 0) {
@@ -151,16 +157,13 @@ int main(int argc, char** argv) {
 		MPI_Send(a, na, MPI_INT, 0, 0, MPI_COMM_WORLD);
 	}
 
-	if (rank == 0)
+	if (rank == 0) {
 		free(data);
+		free(data_serial);
+	}
 	free(a);
 	free(b);
 	free(t);
 	// 释放 MPI 的一些资源
 	MPI_Finalize();
-}
-
-int cmp(const void *a, const void *b)
-{
-	return *(int *)a - *(int *)b;
 }
