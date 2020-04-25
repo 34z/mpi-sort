@@ -206,10 +206,14 @@ int main(int argc, char *argv[])
 
 	if (rank == 0) {
 		free(data);
+		free(data_serial);
 		free(samples);
 	}
 	free(a);
 	free(sample);
+	free(segs_size);
+	free(segs_start);
+	free(that_segs_size);
 	for (int i = 0; i < p; i++) {
 		free(segs[i]);
 	}
