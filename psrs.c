@@ -183,22 +183,25 @@ int main(int argc, char *argv[])
 			idx += that_seg_size;
 		}
 		end = MPI_Wtime();
-		printf("parallel time %.4f\n", end-start);
+		double t_parallel = end - start;
+		// printf("%.4f ", end-start);
 		start = MPI_Wtime();
 		qsort(data_serial, n, sizeof(int), cmp);
 		end = MPI_Wtime();
-		printf("serial time %.4f\n", end-start);
-		int failed = 0;
-		for (int i = 0; i < n; i++) {
-			if (data[i] != data_serial[i]) {
-				failed = i;
-				break;
-			}
-		}
-		if (failed)
-			printf("failed %d\n", failed);
-		else
-			printf("correct\n");
+		double t_serial = end - start;
+		printf("%lf\n", t_serial / t_parallel);
+		// printf("%.4f\n", end-start);
+		// int failed = 0;
+		// for (int i = 0; i < n; i++) {
+		// 	if (data_sorted[i] != data_serial[i]) {
+		// 		failed = i;
+		// 		break;
+		// 	}
+		// }
+		// if (failed)
+		// 	printf("failed %d\n", failed);
+		// else
+		// 	printf("correct\n");
 	} else {
 		MPI_Send(&seg_size, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
 		MPI_Send(seg, seg_size, MPI_INT, 0, 0, MPI_COMM_WORLD);

@@ -78,22 +78,25 @@ int main(int argc, char *argv[])
 	if (rank == 0) {
 		merge_segs(data_p, data_size, p, &data_sorted, NULL);
 		end = MPI_Wtime();
-		printf("parallel time %.4f\n", end-start);
+		double t_parallel = end - start;
+		// printf("%.4f ", end-start);
 		start = MPI_Wtime();
 		qsort(data_serial, n, sizeof(int), cmp);
 		end = MPI_Wtime();
-		printf("serial time %.4f\n", end-start);
-		int failed = 0;
-		for (int i = 0; i < n; i++) {
-			if (data_sorted[i] != data_serial[i]) {
-				failed = i;
-				break;
-			}
-		}
-		if (failed)
-			printf("failed %d\n", failed);
-		else
-			printf("correct\n");
+		double t_serial = end - start;
+		printf("%lf\n", t_serial / t_parallel);
+		// printf("%.4f\n", end-start);
+		// int failed = 0;
+		// for (int i = 0; i < n; i++) {
+		// 	if (data_sorted[i] != data_serial[i]) {
+		// 		failed = i;
+		// 		break;
+		// 	}
+		// }
+		// if (failed)
+		// 	printf("failed %d\n", failed);
+		// else
+		// 	printf("correct\n");
 	}
 
 	if (rank == 0) {
